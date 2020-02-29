@@ -12,9 +12,12 @@ import android.graphics.drawable.BitmapDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.*
 import java.io.ByteArrayOutputStream
 import java.lang.Exception
+
+const val EXTRA_MESSAGE = "com.example.music.MESSAGE"
 
 class MainActivity : AppCompatActivity() {
 
@@ -85,6 +88,8 @@ class MainActivity : AppCompatActivity() {
         buttonDelete.setOnClickListener {
             deleteData(editId.text.toString())
         }
+
+        buttonDelete = findViewById(R.id.buttonGo)
 
         artistDBAdapter = ArtistDBAdapter(this)
         listView = findViewById(R.id.listView)
@@ -187,6 +192,15 @@ class MainActivity : AppCompatActivity() {
         }catch (exception: Exception){
             Log.e("deleteData",exception.toString())
         }
+    }
+
+    fun firstWindow(view: View){
+
+        val intent = Intent(this,FirstActivity::class.java).apply{
+            putExtra(EXTRA_MESSAGE,"FIRST")
+        }
+
+        startActivity(intent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

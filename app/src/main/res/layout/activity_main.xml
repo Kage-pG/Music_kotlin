@@ -92,6 +92,13 @@
             android:layout_height="wrap_content"
             android:text="DELETE" />
 
+        <Button
+            android:id="@+id/buttonGo"
+            android:layout_width="78dp"
+            android:layout_height="wrap_content"
+            android:onClick="firstWindow"
+            android:text="GO" />
+
     </LinearLayout>
     <ListView
         android:id="@+id/listView"

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/artistImage"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        tools:srcCompat="@tools:sample/backgrounds/scenic"
+        android:scaleType="centerCrop"
+        android:gravity="top"/>
+
+    <TextView
+        android:id="@+id/artistName"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:textAlignment="viewEnd"
+        android:gravity="bottom"
+        android:text="artistName"
+        android:textSize="30sp"
+        android:textColor="#FAFAFA"
+        android:shadowColor="#3d3d3d"
+        android:shadowDx = "5"
+        android:shadowDy = "5"
+        android:shadowRadius = "2"
+        android:layout_marginRight="10dp"
+        tools:ignore="RtlCompat" />
+</RelativeLayout>
