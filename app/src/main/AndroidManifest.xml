@@ -10,6 +10,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".ArtistActivity"
+            android:label="@string/title_activity_artist"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
             android:name=".FirstActivity"
             android:parentActivityName=".MainActivity">
             <meta-data
