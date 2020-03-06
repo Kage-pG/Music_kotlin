@@ -1,5 +1,6 @@
 package com.example.music
 
+import android.content.Context
 import android.os.Bundle
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -15,6 +16,13 @@ class ArtistActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_artist)
+
+        val selectId = intent.getStringExtra("SELECT_ID")
+        val pref = this.getSharedPreferences("SELECT_ID", Context.MODE_PRIVATE)
+        val edit = pref.edit()
+        edit.putString("SELECT_ID",selectId)
+        edit.apply()
+
         val sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
         val viewPager: ViewPager = findViewById(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter

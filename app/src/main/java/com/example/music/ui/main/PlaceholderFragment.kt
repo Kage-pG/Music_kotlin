@@ -1,6 +1,5 @@
 package com.example.music.ui.main
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -33,11 +32,16 @@ class PlaceholderFragment : Fragment() {
 
     private var this_context: Context? = null
 
+    var select_id: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pageViewModel = ViewModelProviders.of(this).get(PageViewModel::class.java).apply {
             setIndex(arguments?.getInt(ARG_SECTION_NUMBER) ?: 1)
         }
+
+        val pref = activity?.getSharedPreferences("SELECT_ID",Context.MODE_PRIVATE)
+        select_id = pref?.getString("SELECT_ID", 1.toString()).toString()
     }
 
     override fun onCreateView(
@@ -47,31 +51,32 @@ class PlaceholderFragment : Fragment() {
         val root = inflater.inflate(R.layout.fragment_artist, container, false)
         val listView: ListView = root.findViewById(R.id.contentList) as ListView
 
-        contentDBAdapter = ContentDBAdapter(context!!,this)
-
         this_context = getActivity()?.getApplicationContext()
+
+        contentDBAdapter = ContentDBAdapter(context!!,this)
 
         val dbHelper = MainActivity.ArtistDBHelper(this_context!!,"ArtistDB",null,dbVersion)
         val database = dbHelper.readableDatabase
 
-        val sql = "select id, name, image from " + "ArtistTable"
+        val sql = "select id, name, image from " + "ArtistTable WHERE id = " + select_id
 
         val cursor = database.rawQuery(sql,null)
 
         arrayListId.clear();arrayListName.clear();arrayListBitmap.clear()
 
+
+
         if(cursor.count > 0){
             cursor.moveToFirst()
             while(!cursor.isAfterLast){
                 arrayListId.add(cursor.getString(0))
-                arrayListName.add(cursor.getString(1))
+                arrayListName.add(select_id)
                 val blob: ByteArray = cursor.getBlob(2)
                 val bitmap = BitmapFactory.decodeByteArray(blob, 0, blob.size)
                 arrayListBitmap.add(bitmap)
                 cursor.moveToNext()
             }
         }
-
 
 
         contentDBAdapter.idList = arrayListId
