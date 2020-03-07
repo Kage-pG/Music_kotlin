@@ -60,6 +60,7 @@ class FirstActivity : AppCompatActivity(){
 
         listView.setOnItemClickListener { parent, view, position, id ->
             select_id = arrayListId.get(position)
+            artistTabWindow(view)
         }
     }
 
