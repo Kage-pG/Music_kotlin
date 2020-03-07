@@ -41,6 +41,27 @@ class MainActivity : AppCompatActivity() {
     private lateinit var artistDBAdapter: ArtistDBAdapter
     private lateinit var listView: ListView
 
+    private val contentdbName: String = "ContentDB"
+    private val contenttableName: String = "ContentTable"
+
+    private var arrayListContentId: ArrayList<String> = arrayListOf()
+    private var arrayListContentTitle: ArrayList<String> = arrayListOf()
+    private var arrayListContentBitmap: ArrayList<Bitmap> = arrayListOf()
+    private var arrayListContentCategory: ArrayList<String> = arrayListOf()
+    private var arrayListContentArticle: ArrayList<String> = arrayListOf()
+
+    private lateinit var editContentId: EditText
+    private lateinit var editContentTitle: EditText
+    private lateinit var contentImageView: ImageView
+    private lateinit var editContentCategory: EditText
+    private lateinit var editContentArticle: EditText
+
+    private lateinit var buttonContentPicture: Button
+    private lateinit var buttonContentSelect: Button
+    private lateinit var buttonContentInsert: Button
+    private lateinit var buttonContentUpdate: Button
+    private lateinit var buttonContentDelete: Button
+
     private val requestCodeForPicture = 1001
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,8 +110,6 @@ class MainActivity : AppCompatActivity() {
             deleteData(editId.text.toString())
         }
 
-        buttonDelete = findViewById(R.id.buttonGo)
-
         artistDBAdapter = ArtistDBAdapter(this)
         listView = findViewById(R.id.listView)
         listView.adapter = artistDBAdapter
@@ -99,6 +118,54 @@ class MainActivity : AppCompatActivity() {
             editName.setText(arrayListName.get(position),TextView.BufferType.NORMAL)
             imageView.setImageBitmap(arrayListBitmap.get(position))
         }
+
+        //以下content
+
+        editContentId = findViewById(R.id.editContentId)
+        editContentTitle = findViewById(R.id.editContentTitle)
+        contentImageView = findViewById(R.id.contentImageView)
+        editContentCategory = findViewById(R.id.editContentCategory)
+        editContentArticle = findViewById(R.id.editContentArticle)
+
+        buttonContentPicture = findViewById(R.id.buttonContentPicture)
+        buttonContentPicture.setOnClickListener {
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            intent.type = "image/*"
+            startActivityForResult(intent,requestCodeForPicture)
+        }
+
+        buttonContentSelect = findViewById(R.id.buttonContentSelect)
+        buttonContentSelect.setOnClickListener {
+            selectData()
+            artistDBAdapter.idList = arrayListId
+            artistDBAdapter.nameList = arrayListName
+            artistDBAdapter.imageList = arrayListBitmap
+            artistDBAdapter.notifyDataSetChanged()
+        }
+
+        buttonContentInsert = findViewById(R.id.buttonContentInsert)
+        buttonContentInsert.setOnClickListener {
+            val bitmapDrawable = contentImageView.drawable as BitmapDrawable?
+            if(bitmapDrawable != null){
+                insertContentData(editContentId.text.toString(),editContentTitle.text.toString(),bitmapDrawable.bitmap,editContentCategory.text.toString(),editContentArticle.text.toString())
+            }
+        }
+
+        buttonContentUpdate = findViewById(R.id.buttonContentUpdate)
+        buttonContentUpdate.setOnClickListener {
+            val bitmapDrawable = contentImageView.drawable as BitmapDrawable?
+            if(bitmapDrawable != null){
+                updateContentData(editContentId.text.toString(),editContentTitle.text.toString(),bitmapDrawable.bitmap,editContentCategory.text.toString(),editContentArticle.text.toString())
+            }
+        }
+
+        buttonContentDelete = findViewById(R.id.buttonContentDelete)
+        buttonContentDelete.setOnClickListener {
+            deleteContentData(editContentId.text.toString())
+        }
+
+        buttonDelete = findViewById(R.id.buttonGo)
     }
 
     class ArtistDBHelper(context: Context,databaseName:String,factory: SQLiteDatabase.CursorFactory?,version: Int) :
@@ -191,6 +258,78 @@ class MainActivity : AppCompatActivity() {
             database.delete(tableName,whereClauses,whereArgs)
         }catch (exception: Exception){
             Log.e("deleteData",exception.toString())
+        }
+    }
+
+    //以下content
+
+    class ContentDBHelper(context: Context,databaseName: String,factory: SQLiteDatabase.CursorFactory?,version: Int) :
+        SQLiteOpenHelper(context,databaseName,factory,version){
+
+        override fun onCreate(database: SQLiteDatabase?) {
+            database?.execSQL("create table if not exists ContentTable (id text primary key,title text,image BLOB,category text,article text)")
+        }
+
+        override fun onUpgrade(database: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+            if (oldVersion < newVersion) {
+                database?.execSQL("alter table ContentTable add column deleteFlag integer default 0")
+            }
+        }
+    }
+
+    private fun insertContentData(id: String, title: String, bitmap: Bitmap, category: String, article: String){
+        try{
+            val dbHelper = ContentDBHelper(applicationContext,contentdbName,null,dbVersion)
+            val database = dbHelper.writableDatabase
+
+            val values = ContentValues()
+            values.put("id",id)
+            values.put("title",title)
+            val byteArrayOutputStream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream)
+            val bytes = byteArrayOutputStream.toByteArray()
+            values.put("image",bytes)
+            values.put("category",category)
+            values.put("article",article)
+
+            database.insertOrThrow(contenttableName,null,values)
+        }catch (exception: Exception){
+            Log.e("insertContentData",exception.toString())
+        }
+    }
+
+    private fun updateContentData(whereId: String, newTitle: String, newBitmap: Bitmap, newCategory: String, newArticle: String){
+        try {
+            val dbHelper = ArtistDBHelper(applicationContext,contentdbName,null,dbVersion)
+            val database = dbHelper.writableDatabase
+
+            val values = ContentValues()
+            values.put("title",newTitle)
+            val byteArrayOutputStream = ByteArrayOutputStream()
+            newBitmap.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream)
+            val bytes = byteArrayOutputStream.toByteArray()
+            values.put("image",bytes)
+            values.put("category",newCategory)
+            values.put("article",newArticle)
+
+            val whereClauses = "id = ?"
+            val whereArgs = arrayOf(whereId)
+            database.update(contenttableName,values,whereClauses,whereArgs)
+        }catch (exception: Exception){
+            Log.e("updateContentData",exception.toString())
+        }
+    }
+
+    private fun deleteContentData(whereId: String){
+        try {
+            val dbHelper = ArtistDBHelper(applicationContext,contentdbName,null,dbVersion)
+            val database = dbHelper.writableDatabase
+
+            val whereClauses = "id = ?"
+            val whereArgs = arrayOf(whereId)
+            database.delete(contenttableName,whereClauses,whereArgs)
+        }catch (exception: Exception){
+            Log.e("deleteContentData",exception.toString())
         }
     }
 
