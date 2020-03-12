@@ -53,6 +53,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var editContentId: EditText
     private lateinit var editContentTitle: EditText
     private lateinit var contentImageView: ImageView
+    private lateinit var editContentArtistId: EditText
     private lateinit var editContentCategory: EditText
     private lateinit var editContentArticle: EditText
 
@@ -111,19 +112,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         artistDBAdapter = ArtistDBAdapter(this)
-        listView = findViewById(R.id.listView)
-        listView.adapter = artistDBAdapter
-        listView.setOnItemClickListener { parent, view, position, id ->
-            editId.setText(arrayListId.get(position), TextView.BufferType.NORMAL)
-            editName.setText(arrayListName.get(position),TextView.BufferType.NORMAL)
-            imageView.setImageBitmap(arrayListBitmap.get(position))
-        }
+        
 
         //以下content
 
         editContentId = findViewById(R.id.editContentId)
         editContentTitle = findViewById(R.id.editContentTitle)
         contentImageView = findViewById(R.id.contentImageView)
+        editContentArtistId = findViewById(R.id.editContentArtistId)
         editContentCategory = findViewById(R.id.editContentCategory)
         editContentArticle = findViewById(R.id.editContentArticle)
 
@@ -146,9 +142,9 @@ class MainActivity : AppCompatActivity() {
 
         buttonContentInsert = findViewById(R.id.buttonContentInsert)
         buttonContentInsert.setOnClickListener {
-            val bitmapDrawable = contentImageView.drawable as BitmapDrawable?
+            val bitmapDrawable = imageView.drawable as BitmapDrawable?
             if(bitmapDrawable != null){
-                insertContentData(editContentId.text.toString(),editContentTitle.text.toString(),bitmapDrawable.bitmap,editContentCategory.text.toString(),editContentArticle.text.toString())
+                insertContentData(editContentId.text.toString(),editContentTitle.text.toString(),bitmapDrawable.bitmap,editContentArtistId.text.toString(),editContentCategory.text.toString(),editContentArticle.text.toString())
             }
         }
 
@@ -156,7 +152,7 @@ class MainActivity : AppCompatActivity() {
         buttonContentUpdate.setOnClickListener {
             val bitmapDrawable = contentImageView.drawable as BitmapDrawable?
             if(bitmapDrawable != null){
-                updateContentData(editContentId.text.toString(),editContentTitle.text.toString(),bitmapDrawable.bitmap,editContentCategory.text.toString(),editContentArticle.text.toString())
+                updateContentData(editContentId.text.toString(),editContentTitle.text.toString(),bitmapDrawable.bitmap,editContentArtistId.text.toString(),editContentCategory.text.toString(),editContentArticle.text.toString())
             }
         }
 
@@ -173,11 +169,13 @@ class MainActivity : AppCompatActivity() {
 
         override fun onCreate(database: SQLiteDatabase?) {
             database?.execSQL("create table if not exists ArtistTable (id text primary key, name text, image BLOB)")
+            database?.execSQL("create table if not exists ContentTable (id text primary key, title text, image BLOB, artist_id text, category text, article text)")
         }
 
         override fun onUpgrade(database: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
             if (oldVersion < newVersion) {
                 database?.execSQL("alter table ArtistTable add column deleteFlag integer default 0")
+                database?.execSQL("alter table ContentTable add column deleteFlag integer default 0")
             }
         }
     }
@@ -264,10 +262,10 @@ class MainActivity : AppCompatActivity() {
     //以下content
 
     class ContentDBHelper(context: Context,databaseName: String,factory: SQLiteDatabase.CursorFactory?,version: Int) :
-        SQLiteOpenHelper(context,databaseName,factory,version){
+            SQLiteOpenHelper(context,databaseName,factory,version){
 
         override fun onCreate(database: SQLiteDatabase?) {
-            database?.execSQL("create table if not exists ContentTable (id text primary key,title text,image BLOB,category text,article text)")
+            database?.execSQL("create table if not exists ContentTable (id text primary key, title text, image BLOB, artist_id text, category text, article text)")
         }
 
         override fun onUpgrade(database: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
@@ -277,9 +275,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun insertContentData(id: String, title: String, bitmap: Bitmap, category: String, article: String){
+    private fun insertContentData(id: String, title: String, bitmap: Bitmap, artist_id: String, category: String, article: String){
         try{
-            val dbHelper = ContentDBHelper(applicationContext,contentdbName,null,dbVersion)
+            val dbHelper = ArtistDBHelper(applicationContext,dbName,null,dbVersion)
             val database = dbHelper.writableDatabase
 
             val values = ContentValues()
@@ -289,6 +287,7 @@ class MainActivity : AppCompatActivity() {
             bitmap.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream)
             val bytes = byteArrayOutputStream.toByteArray()
             values.put("image",bytes)
+            values.put("artist_id",artist_id)
             values.put("category",category)
             values.put("article",article)
 
@@ -298,9 +297,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateContentData(whereId: String, newTitle: String, newBitmap: Bitmap, newCategory: String, newArticle: String){
+    private fun updateContentData(whereId: String, newTitle: String, newBitmap: Bitmap, artist_id: String, newCategory: String, newArticle: String){
         try {
-            val dbHelper = ArtistDBHelper(applicationContext,contentdbName,null,dbVersion)
+            val dbHelper = ContentDBHelper(applicationContext,contentdbName,null,dbVersion)
             val database = dbHelper.writableDatabase
 
             val values = ContentValues()
@@ -309,6 +308,7 @@ class MainActivity : AppCompatActivity() {
             newBitmap.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream)
             val bytes = byteArrayOutputStream.toByteArray()
             values.put("image",bytes)
+            values.put("artist_id",artist_id)
             values.put("category",newCategory)
             values.put("article",newArticle)
 
@@ -322,7 +322,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun deleteContentData(whereId: String){
         try {
-            val dbHelper = ArtistDBHelper(applicationContext,contentdbName,null,dbVersion)
+            val dbHelper = ContentDBHelper(applicationContext,contentdbName,null,dbVersion)
             val database = dbHelper.writableDatabase
 
             val whereClauses = "id = ?"

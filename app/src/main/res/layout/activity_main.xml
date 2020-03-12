@@ -32,8 +32,7 @@
             android:text="Name"
             android:layout_width="100dp"
             android:layout_height="40dp"
-            android:id="@+id/textName"
-            tools:text="Name"/>
+            android:id="@+id/textName" />
 
         <EditText
             android:layout_width="wrap_content"
@@ -101,11 +100,6 @@
 
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/listView"
-        android:layout_width="match_parent"
-        android:layout_height="239dp" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -131,8 +125,7 @@
             android:text="ContentTitle"
             android:layout_width="100dp"
             android:layout_height="40dp"
-            android:id="@+id/textContentTitle"
-            tools:text="Name"/>
+            android:id="@+id/textContentTitle" />
 
         <EditText
             android:layout_width="wrap_content"
@@ -167,16 +160,33 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <TextView
-            android:text="ContentCategory"
+            android:text="ContentArtistId"
             android:layout_width="100dp"
             android:layout_height="40dp"
-            android:id="@+id/textContentCategory"
-            tools:text="Name"/>
+            android:id="@+id/textContentArtistId" />
 
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="textPersonName"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/editContentArtistId"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:text="Category"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:id="@+id/textContentCategory" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="number"
             android:ems="10"
             android:id="@+id/editContentCategory"/>
     </LinearLayout>
@@ -186,11 +196,10 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <TextView
-            android:text="ContentArticle"
+            android:text="Article"
             android:layout_width="100dp"
             android:layout_height="40dp"
-            android:id="@+id/textContentArticle"
-            tools:text="Name"/>
+            android:id="@+id/textContentArticle" />
 
         <EditText
             android:layout_width="wrap_content"
@@ -230,4 +239,6 @@
             android:text="DELETE" />
 
     </LinearLayout>
+
+
 </LinearLayout>

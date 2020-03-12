@@ -20,7 +20,7 @@ class PlaceholderFragment : Fragment() {
 
     private lateinit var pageViewModel: PageViewModel
 
-    private val dbName: String = "ContentDB"
+    private val dbName: String = "ArtistDB"
     private val tableName: String = "ContentTable"
     private val dbVersion: Int = 1
     private var arrayListId: ArrayList<String> = arrayListOf()
@@ -42,6 +42,7 @@ class PlaceholderFragment : Fragment() {
 
         val pref = activity?.getSharedPreferences("SELECT_ID",Context.MODE_PRIVATE)
         select_id = pref?.getString("SELECT_ID", 1.toString()).toString()
+        val c = "LIVE"
     }
 
     override fun onCreateView(
@@ -55,10 +56,54 @@ class PlaceholderFragment : Fragment() {
 
         contentDBAdapter = ContentDBAdapter(context!!,this)
 
-        val dbHelper = MainActivity.ArtistDBHelper(this_context!!,"ArtistDB",null,dbVersion)
+        val dbHelper = MainActivity.ArtistDBHelper(this_context!!,dbName,null,dbVersion)
         val database = dbHelper.readableDatabase
 
-        val sql = "select id, name, image from " + "ArtistTable WHERE id = " + select_id
+        val sql = "select id, category, image from " + tableName + " WHERE artist_id = " + select_id
+
+        val cursor = database.rawQuery(sql,null)
+
+        arrayListId.clear();arrayListName.clear();arrayListBitmap.clear()
+
+
+
+        if(cursor.count > 0){
+            cursor.moveToFirst()
+            while(!cursor.isAfterLast){
+                arrayListId.add(cursor.getString(0))
+                arrayListName.add(cursor.getString(1))
+                val blob: ByteArray = cursor.getBlob(2)
+                val bitmap = BitmapFactory.decodeByteArray(blob, 0, blob.size)
+                arrayListBitmap.add(bitmap)
+                cursor.moveToNext()
+            }
+        }
+
+
+        contentDBAdapter.idList = arrayListId
+        contentDBAdapter.nameList = arrayListName
+        contentDBAdapter.imageList = arrayListBitmap
+        contentDBAdapter.notifyDataSetChanged()
+
+        pageViewModel.text.observe(this, Observer<String> {
+            when(it){
+                "1" -> selectLive("1")
+                else -> for (i in 0..10){
+                    listView.adapter = contentDBAdapter
+                }
+            }
+            listView.adapter = contentDBAdapter
+        })
+        return root
+    }
+
+    fun selectLive(category: String){
+        contentDBAdapter = ContentDBAdapter(context!!,this)
+
+        val dbHelper = MainActivity.ArtistDBHelper(this_context!!,dbName,null,dbVersion)
+        val database = dbHelper.readableDatabase
+
+        val sql = "select id, title, image, category from " + tableName + " WHERE artist_id = " + select_id + " AND category = " + category
 
         val cursor = database.rawQuery(sql,null)
 
@@ -83,11 +128,6 @@ class PlaceholderFragment : Fragment() {
         contentDBAdapter.nameList = arrayListName
         contentDBAdapter.imageList = arrayListBitmap
         contentDBAdapter.notifyDataSetChanged()
-
-        pageViewModel.text.observe(this, Observer<String> {
-            listView.adapter = contentDBAdapter
-        })
-        return root
     }
 
     companion object {
