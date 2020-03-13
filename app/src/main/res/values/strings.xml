@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Music</string>
     <string name="title_activity_artist">ArtistActivity</string>
-    <string name="tab_text_1">1</string>
-    <string name="tab_text_2">2</string>
+    <string name="tab_text_0">HOME</string>
+    <string name="tab_text_1">LIVE</string>
+    <string name="tab_text_2">NEWS</string>
+    <string name="tab_text_3">DISCO</string>
 </resources>

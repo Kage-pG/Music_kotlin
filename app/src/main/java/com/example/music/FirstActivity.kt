@@ -19,7 +19,7 @@ class FirstActivity : AppCompatActivity(){
 
     private lateinit var firstDBAdapter: FirstDBAdapter
     private lateinit var listView: ListView
-    private var select_id: String = "1"
+    private var select_id: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?){
 

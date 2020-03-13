@@ -41,7 +41,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var artistDBAdapter: ArtistDBAdapter
     private lateinit var listView: ListView
 
-    private val contentdbName: String = "ContentDB"
     private val contenttableName: String = "ContentTable"
 
     private var arrayListContentId: ArrayList<String> = arrayListOf()
@@ -112,7 +111,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         artistDBAdapter = ArtistDBAdapter(this)
-        
+
 
         //以下content
 
@@ -299,7 +298,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateContentData(whereId: String, newTitle: String, newBitmap: Bitmap, artist_id: String, newCategory: String, newArticle: String){
         try {
-            val dbHelper = ContentDBHelper(applicationContext,contentdbName,null,dbVersion)
+            val dbHelper = ContentDBHelper(applicationContext,dbName,null,dbVersion)
             val database = dbHelper.writableDatabase
 
             val values = ContentValues()
@@ -322,7 +321,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun deleteContentData(whereId: String){
         try {
-            val dbHelper = ContentDBHelper(applicationContext,contentdbName,null,dbVersion)
+            val dbHelper = ContentDBHelper(applicationContext,dbName,null,dbVersion)
             val database = dbHelper.writableDatabase
 
             val whereClauses = "id = ?"
